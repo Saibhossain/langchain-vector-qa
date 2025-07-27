@@ -1,6 +1,6 @@
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 from langchain_community.llms import Ollama  # Use this if running locally
@@ -19,3 +19,5 @@ print(f"✅ Split into {len(chunks)} chunks.")
 
 embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
 
+vectorstore = FAISS.from_documents(chunks,embedding_model)
+print("✅ FAISS vectorstore created with embedded chunks.")

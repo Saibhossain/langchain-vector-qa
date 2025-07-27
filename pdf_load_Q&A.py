@@ -20,4 +20,14 @@ print(f"✅ Split into {len(chunks)} chunks.")
 embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
 
 vectorstore = FAISS.from_documents(chunks,embedding_model)
+retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 print("✅ FAISS vectorstore created with embedded chunks.")
+
+llm = Ollama(model="gemma3n:latest")
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    retrieve=retriever,
+    chain_type="stuff",
+    return_source_documents=True
+)

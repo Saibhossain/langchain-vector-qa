@@ -20,3 +20,26 @@ def load_and_index_pdfs(pdf_file):
         vectorstore = FAISS.from_documents(chunks,embadder)
         return vectorstore
 
+def extract_images_and_tables(pdf_path):
+    import pdfplumber , fitz
+    from PIL import Image
+    import matplotlib.pyplot as plt
+    from io import BytesIO
+
+    visuals = []
+
+    doc = fitz.open(pdf_path)
+    for page in doc:
+        for img in page.get_image(full=True):
+            base_image = fitz.Pixmap(doc,img[0])
+            if base_image.n<5:
+                img_data = base_image.tobytes("png")
+                visuals.append(Image.open(BytesIO(img_data)))
+
+    doc.close()
+
+    tables = []
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            tables.extend(page.extract_table())
+    return visuals, tables
